@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desdobramento de Meta · Tesla Imagem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef3f6;--surface:#fff;--ink:#0f2a3a;--muted:#5d7482;--line:#d5e0e7;
+  --wk:#0e7490;--wk-bg:#dff3f8;--sat:#b45309;--sat-bg:#fdefd6;--sun:#6d28d9;--sun-bg:#ece4fb;
+  --off:#8a9aa5;--off-bg:#e6ebee;--hol:#be123c;--hol-bg:#fde4ea;--head:#0f2a3a;--headink:#fff;--accent:#14b8a6;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1820;--surface:#122632;--ink:#e6f0f5;--muted:#8fa7b5;--line:#244050;
+  --wk:#5fd0e8;--wk-bg:#123a47;--sat:#f5b35c;--sat-bg:#40300f;--sun:#b79cf5;--sun-bg:#2a1f4a;
+  --off:#7c8f9b;--off-bg:#1a2f3b;--hol:#fb7a98;--hol-bg:#47182a;--head:#061219;--headink:#e6f0f5;
+}}
+:root[data-theme="dark"]{
+  --bg:#0b1820;--surface:#122632;--ink:#e6f0f5;--muted:#8fa7b5;--line:#244050;
+  --wk:#5fd0e8;--wk-bg:#123a47;--sat:#f5b35c;--sat-bg:#40300f;--sun:#b79cf5;--sun-bg:#2a1f4a;
+  --off:#7c8f9b;--off-bg:#1a2f3b;--hol:#fb7a98;--hol-bg:#47182a;--head:#061219;--headink:#e6f0f5;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header.top{background:var(--head);color:var(--headink);border-radius:18px;padding:22px 24px;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+header.top h1{margin:0;font-size:clamp(1.3rem,3.5vw,1.9rem);font-weight:800;letter-spacing:-.02em}
+header.top p{margin:4px 0 0;opacity:.75;font-size:.92rem}
+.pick{display:flex;gap:10px;flex-wrap:wrap}
+.pick label{display:flex;flex-direction:column;font-size:.78rem;gap:4px;opacity:.9;font-weight:500}
+.pick select,.pick input,.panel input{font:inherit;font-weight:700;padding:9px 12px;border-radius:10px;border:2px solid transparent;background:#fff;color:#0f2a3a;min-width:0}
+.pick select{min-width:140px}.pick input{width:100px}
+.pick select:focus,.pick input:focus,.panel input:focus,button:focus-visible,.day:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat small{color:var(--muted);font-size:.8rem}
+.stat b{display:block;font-size:1.9rem;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.stat.main{border:2px solid var(--accent)}
+.stat input{font-size:1.9rem;font-weight:800;width:100%;border:0;background:transparent;color:var(--ink);padding:0;border-bottom:2px dashed var(--line);border-radius:0}
+.stat span{font-size:.8rem;color:var(--muted)}
+.warn{color:var(--hol);font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 4px;font-size:1.05rem}
+.panel .hint{margin:0 0 12px;color:var(--muted);font-size:.88rem}
+.params{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.params label{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.panel input{border:2px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;font-size:.82rem}
+.legend i{font-style:normal;padding:4px 10px;border-radius:999px;font-weight:700}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{text-align:center;font-weight:700;font-size:.8rem;color:var(--muted);padding:4px 0}
+.day{all:unset;box-sizing:border-box;cursor:pointer;min-height:92px;border-radius:12px;padding:7px 8px;display:flex;flex-direction:column;justify-content:space-between;border:2px solid transparent;transition:transform .12s,border-color .12s;-webkit-tap-highlight-color:transparent}
+.day:hover{transform:translateY(-2px);border-color:currentColor}
+.day.blank{visibility:hidden;cursor:default}
+.day .n{font-weight:800;font-size:.95rem}
+.day .m{font-size:1.5rem;font-weight:800;line-height:1;letter-spacing:-.02em}
+.day .t{font-size:.68rem;font-weight:500;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day.wk{background:var(--wk-bg);color:var(--wk)}
+.day.sat{background:var(--sat-bg);color:var(--sat)}
+.day.sun{background:var(--sun-bg);color:var(--sun)}
+.day.off{background:var(--off-bg);color:var(--off)}
+.day.off .m{font-size:1rem;text-decoration:line-through}
+.day.hol{background:var(--hol-bg);color:var(--hol)}
+.day.hol .m{font-size:1rem}
+.day{cursor:default;min-height:128px;gap:4px}
+.day:hover{transform:none;border-color:transparent}
+.day .tp{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.day .tg{all:unset;box-sizing:border-box;cursor:pointer;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:6px;background:rgba(127,127,127,.2)}
+.day .tg:hover{background:rgba(127,127,127,.38)}
+.day .tg:focus-visible{outline:2px solid currentColor}
+.day .r{width:100%;font:inherit;font-weight:800;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid currentColor;background:var(--surface);color:var(--ink);min-width:0;-moz-appearance:textfield}
+.day .r::-webkit-inner-spin-button,.day .r::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.day .r:focus{outline:3px solid var(--accent);outline-offset:1px}
+.day .pc{font-size:.68rem;font-weight:800;min-height:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar+small{font-size:.75rem;font-weight:700;color:var(--muted)}
+:root{--lo-bg:#fbd0d0;--lo:#a11212;--mid-bg:#fff0a8;--mid:#7a5b00;--ok-bg:#c9efd2;--ok:#116a2e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--lo-bg:#5a1c1c;--lo:#ff9a9a;--mid-bg:#554a0a;--mid:#ffe36b;--ok-bg:#16482a;--ok:#7be39a}}
+:root[data-theme="dark"]{--lo-bg:#5a1c1c;--lo:#ff9a9a;--mid-bg:#554a0a;--mid:#ffe36b;--ok-bg:#16482a;--ok:#7be39a}
+@media print{:root:root:root{--lo-bg:#fbd0d0;--lo:#a11212;--mid-bg:#fff0a8;--mid:#7a5b00;--ok-bg:#c9efd2;--ok:#116a2e}}
+.day.lo,.chip.lo,.lg.lo{background:var(--lo-bg);color:var(--lo)}
+.day.mid,.chip.mid,.lg.mid{background:var(--mid-bg);color:var(--mid)}
+.day.ok,.chip.ok,.lg.ok{background:var(--ok-bg);color:var(--ok)}
+.chip{display:inline-block;padding:1px 9px;border-radius:999px;font-weight:800}
+.lg{font-style:normal;padding:4px 10px;border-radius:999px;font-weight:700}
+.tabs{display:flex;gap:8px;flex-basis:100%}
+.tab{font:inherit;font-weight:700;padding:8px 16px;border-radius:999px;border:2px solid rgba(255,255,255,.35);background:transparent;color:inherit;cursor:pointer}
+.tab.on{background:#fff;color:#0f2a3a;border-color:#fff}
+.tab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#anual{display:none}
+.wrap.anual #anual{display:block}
+.wrap.anual>:not(header):not(#anual){display:none}
+.wrap.anual .pick label:first-child{display:none}
+.lk{all:unset;cursor:pointer;font-weight:800;color:var(--wk);text-decoration:underline;text-underline-offset:3px}
+.lk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip.and{background:var(--wk-bg);color:var(--wk)}
+.bm{fill:var(--muted);opacity:.35}.b-ok{fill:#22a05a}.b-mid{fill:#e5b400}.b-lo{fill:#d63a3a}.b-and{fill:var(--wk)}.b-x{fill:none}
+.tx{font-size:11px;fill:var(--muted)}.tb{fill:var(--ink);font-weight:700}.ax{stroke:var(--line)}
+#aChart svg{width:100%;height:auto;display:block}
+.lgd{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin:6px 0 12px}.lgd i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.sub{margin:18px 0 8px;font-size:.95rem}
+.hh{display:flex;gap:6px}.hh input{width:50%}
+.day.man,.lg.man{background:repeating-linear-gradient(45deg,var(--off-bg),var(--off-bg) 6px,var(--surface) 6px,var(--surface) 12px);color:var(--ink)}
+.day.man .m{font-size:.95rem}
+#menu{position:fixed;z-index:50;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:6px;display:none;min-width:160px}
+#menu.on{display:block}
+#menu b{display:block;font-size:.72rem;color:var(--muted);padding:4px 8px}
+#menu button{all:unset;box-sizing:border-box;display:block;width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+#menu button:hover,#menu button:focus-visible{background:var(--bg);outline:2px solid var(--accent)}
+@media print{.day.man .m{font-size:.62rem}#menu{display:none!important}}
+.day .lb{font-size:.64rem;font-weight:700;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day .lm{font-weight:500;opacity:.85}
+@media (max-width:640px){.day .lm{display:none}}
+@media print{.day .lb{font-size:.5rem}}
+#diaP{display:none}
+.wrap.dia #diaP{display:block}
+.wrap.dia>:not(header):not(#diaP){display:none}
+.wrap.dia .pick{display:none}
+.dnav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 14px}
+.dnav input{width:auto}
+.dhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dhead h3{margin:0;font-size:1.25rem;text-transform:capitalize}
+.dhead .tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#dStats{margin-top:12px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0 0}
+.dgrid label{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted)}
+.dgrid input,.dgrid textarea{font:inherit;font-weight:700;padding:9px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.dgrid input{font-size:1.4rem}
+.dgrid textarea{font-weight:500;resize:vertical}
+.dgrid input:focus,.dgrid textarea:focus{outline:3px solid var(--accent);outline-offset:2px}
+.dgrid input:disabled{opacity:.5}
+.dn{all:unset;cursor:pointer;font-weight:800;font-size:.95rem;text-decoration:underline dotted;text-underline-offset:3px}
+.dn:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.chip.off{background:var(--off-bg);color:var(--off)}
+.chip.hl{background:var(--hol-bg);color:var(--hol)}
+@media print{.wrap.dia>#diaP{grid-column:1/3;grid-row:2}.dnav{display:none}#diaP .stats{grid-template-columns:repeat(3,1fr)}.day .dn{font-size:.72rem}.dgrid input,.dgrid textarea{border:0;border-bottom:1px solid #000;border-radius:0;background:transparent}}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem;min-width:520px}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:700;font-size:.8rem}
+tfoot td{font-weight:800;border-bottom:0}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;min-width:80px}
+.bar div{height:100%;background:var(--accent)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button.btn{font:inherit;font-weight:700;padding:9px 14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.btn:hover{border-color:var(--accent)}
+@media (max-width:640px){.day{min-height:104px;padding:5px}.day .m{font-size:1.1rem}.day .t{display:none}.cal{gap:4px}.day .tg{font-size:.55rem;padding:1px 3px}.day .r{font-size:.8rem;padding:3px}.day .pc{font-size:.58rem}}
+.ptitle{display:none}
+@page{size:A4 landscape;margin:8mm}
+@media print{
+:root:root:root{--bg:#fff;--surface:#fff;--ink:#0f2a3a;--muted:#4b5f6b;--line:#c5d2da;--wk:#0e7490;--wk-bg:#dff3f8;--sat:#b45309;--sat-bg:#fdefd6;--sun:#6d28d9;--sun-bg:#ece4fb;--off:#6b7b86;--off-bg:#e6ebee;--hol:#be123c;--hol-bg:#fde4ea;--accent:#0e7490;padding:0}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{background:#fff}
+.wrap{max-width:none;padding:0;display:grid;grid-template-columns:1.3fr 1fr;grid-template-rows:auto auto 1fr;gap:6px;align-items:start}
+.actions,.params-panel,.pick,.hint,.tg{display:none!important}
+header.top{grid-column:1/3;background:#fff;color:#000;border:1px solid #000;border-radius:8px;padding:6px 12px;gap:8px}
+header.top h1{font-size:1.05rem}header.top p{font-size:.7rem;margin:0;opacity:1}
+.ptitle{display:block;font-size:1.2rem;font-weight:800}
+.wrap>:nth-child(3){grid-column:1;grid-row:2/4}
+.tabs{display:none!important}
+.wrap.anual>#anual{grid-column:1/3;grid-row:2}
+#anual .stats{grid-template-columns:repeat(3,1fr);gap:6px}
+#anual .stat b{font-size:1.3rem}
+#anual table{font-size:.72rem}#anual th,#anual td{padding:4px 5px}
+#aChart svg{max-height:75mm;width:100%}
+.wrap>:nth-child(2){grid-column:2;grid-row:2}
+.wrap>:nth-child(4){grid-column:2;grid-row:3}
+.stats{grid-template-columns:1fr 1fr;gap:5px;margin:0}
+.stat{padding:5px 8px;border-radius:8px}.stat small{font-size:.62rem}.stat b{font-size:1.15rem}.stat span{font-size:.58rem;display:block;line-height:1.2}
+.stat input{font-size:1.15rem;border:0}
+.panel{margin:0;padding:6px 8px;border-radius:8px;break-inside:avoid}
+.panel h2{font-size:.8rem;margin:0 0 4px}
+.legend{margin-bottom:5px;gap:4px;font-size:.58rem}.legend i{padding:2px 6px}
+.cal{gap:3px}.dow{font-size:.62rem;padding:0}
+.day{min-height:68px;padding:3px 4px;border-radius:6px;gap:1px}
+.day .n{font-size:.72rem}.day .m{font-size:1.05rem}.day.off .m,.day.hol .m{font-size:.62rem}.day .t{font-size:.52rem}.day .pc{font-size:.55rem}
+.day .r{border:0;border-bottom:1px solid currentColor;border-radius:0;background:transparent;padding:0;font-size:.8rem;color:inherit}
+.day .r::placeholder{color:transparent}
+.day:hover{transform:none}
+.scroll{overflow:visible}table{min-width:0;font-size:.68rem}th,td{padding:3px 5px}.bar{min-width:50px;height:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Desdobramento de meta · Tesla Imagem</h1>
+      <p>Distribua a meta mensal de exames dia a dia, semana a semana.</p>
+      <div id="ptitle" class="ptitle"></div>
+    </div>
+    <div class="pick">
+      <label>Mês<select id="mes"></select></label>
+      <label>Ano<input id="ano" type="number" min="2020" max="2100"></label>
+    </div>
+    <nav class="tabs"><button class="tab on" id="tabM" aria-pressed="true">Visão mensal</button><button class="tab" id="tabA" aria-pressed="false">Visão anual</button><button class="tab" id="tabD" aria-pressed="false">Detalhamento do dia</button></nav>
+  </header>
+
+  <section class="stats" id="stats"></section>
+
+  <section class="panel">
+    <h2>Calendário do mês</h2>
+    <p class="hint">Digite os exames realizados em cada dia aberto (Enter vai para o próximo dia). Use Fechar/Abrir para feriado, manutenção ou domingo extra. Nos dias ainda sem lançamento, o número grande é quanto precisa ser realizado para fechar a meta do mês e é recalculado a cada lançamento. Os lançamentos ficam salvos neste navegador.</p>
+    <div class="legend">
+      <i style="background:var(--wk-bg);color:var(--wk)">Segunda a sexta</i>
+      <i style="background:var(--sat-bg);color:var(--sat)">Sábado</i>
+      <i style="background:var(--sun-bg);color:var(--sun)">Domingo aberto</i>
+      <i style="background:var(--hol-bg);color:var(--hol)">Feriado</i>
+      <i style="background:var(--off-bg);color:var(--off)">Fechado</i>
+      <i class="lg man">Manutenção</i>
+      <i class="lg lo">Ocupação abaixo de 80%</i>
+      <i class="lg mid">80% a 99%</i>
+      <i class="lg ok">100% ou mais</i>
+    </div>
+    <div class="cal" id="cal"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Meta por semana</h2>
+    <p class="hint">Semanas de domingo a sábado. O realizado é a soma dos dias lançados; a ocupação compara o realizado com a capacidade dos dias lançados.</p>
+    <div class="scroll"><table id="semanas"></table></div>
+  </section>
+
+  <section class="panel" id="anual">
+    <h2>Meta anual e atingimento · <span id="aAno"></span></h2>
+    <p class="hint">Meta, realizado e atingimento de cada mês. O mês atual aparece como "em andamento" e meses sem lançamento ficam em branco. Clique no nome do mês para abrir o detalhe diário.</p>
+    <div class="actions" style="margin-bottom:12px"><button class="btn" id="aPrint">Imprimir visão anual</button></div>
+    <div class="stats" id="aStats"></div>
+    <div class="lgd"><span><i style="background:var(--muted);opacity:.35"></i>Meta do mês</span><span><i style="background:#22a05a"></i>Realizado ≥ 100%</span><span><i style="background:#e5b400"></i>80% a 99%</span><span><i style="background:#d63a3a"></i>abaixo de 80%</span><span><i style="background:var(--wk)"></i>mês em andamento</span></div>
+    <div id="aChart"></div>
+    <div class="scroll"><table id="aTab"></table></div>
+  </section>
+
+  <section class="panel" id="diaP">
+    <h2>Detalhamento do dia</h2>
+    <div class="dnav">
+      <button class="btn" id="dPrev" aria-label="Dia anterior">◀</button>
+      <input type="date" id="dData" aria-label="Data">
+      <button class="btn" id="dNext" aria-label="Próximo dia">▶</button>
+      <button class="btn" id="dHoje">Hoje</button>
+      <button class="btn" id="dPrint">Imprimir dia</button>
+    </div>
+    <div id="dHead"></div>
+    <div class="stats" id="dStats"></div>
+    <div class="dgrid">
+      <label>Exames realizados no dia<input id="dReal" type="number" min="0" inputmode="numeric" placeholder="Realizado"></label>
+      <label>Observações do dia<textarea id="dObs" rows="3" placeholder="Intercorrências, equipamento parado, falta de profissional..."></textarea></label>
+    </div>
+  </section>
+
+  <section class="panel params-panel">
+    <h2>Parâmetros da clínica</h2>
+    <p class="hint">Capacidade diária de exames. Altere se a operação mudar.</p>
+    <div class="params">
+      <label>Segunda a sexta<input id="pWk" type="number" min="0" value="46"></label>
+      <label>Sábados<input id="pSat" type="number" min="0" value="34"></label>
+      <label>Domingos<input id="pSun" type="number" min="0" value="12"></label>
+      <label>Domingos abertos no mês<input id="pSunQ" type="number" min="0" max="5" value="2"></label>
+    </div>
+    <h3 class="sub">Horário previsto de funcionamento · <span id="hMes"></span></h3>
+    <div class="params">
+      <label>Segunda a sexta<span class="hh"><input type="time" id="hWk0" aria-label="Início segunda a sexta"><input type="time" id="hWk1" aria-label="Fim segunda a sexta"></span></label>
+      <label>Sábados<span class="hh"><input type="time" id="hSat0" aria-label="Início sábado"><input type="time" id="hSat1" aria-label="Fim sábado"></span></label>
+      <label>Domingos<span class="hh"><input type="time" id="hSun0" aria-label="Início domingo"><input type="time" id="hSun1" aria-label="Fim domingo"></span></label>
+    </div>
+    <p class="hint" style="margin:8px 0 0">Vale para o mês selecionado no topo e aparece em cada dia aberto do calendário. Troque o mês para informar outro horário.</p>
+    <div class="actions" style="margin-top:10px"><button class="btn" id="hAll">Repetir em todos os meses do ano</button></div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn" id="reset">Restaurar calendário padrão</button>
+      <button class="btn" id="clearReal">Limpar ocupação do mês</button>
+      <button class="btn" id="print">Imprimir</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const $=id=>document.getElementById(id);
+const hoje=new Date();
+let D={real:{},metas:{},over:{},anual:{},motivo:{},horas:{},horasM:{},obs:{}};
+try{const s=JSON.parse(localStorage.getItem('tesla-meta-v1'));if(s&&typeof s==='object')D={real:s.real||{},metas:s.metas||{},over:s.over||{},anual:s.anual||{},motivo:s.motivo||{},horas:s.horas||{},horasM:s.horasM||{},obs:s.obs||{}}}catch(e){}
+const save=()=>{try{localStorage.setItem('tesla-meta-v1',JSON.stringify(D))}catch(e){}};
+const S={mes:hoje.getMonth(),ano:hoje.getFullYear(),meta:null,over:D.over};
+const ym=()=>S.ano+'-'+S.mes;
+S.meta=D.metas[ym()]??null;
+
+MESES.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;$('mes').appendChild(o)});
+$('mes').value=S.mes;$('ano').value=S.ano;
+
+const key=(y,m,d)=>`${y}-${m}-${d}`;
+function pascoa(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(y,mes-1,dia)}
+function feriados(y){
+  const h={};
+  [[0,1,'Confraternização Universal'],[3,21,'Tiradentes'],[4,1,'Dia do Trabalho'],[8,7,'Independência'],[9,12,'N. Sra. Aparecida'],[10,2,'Finados'],[10,15,'Proclamação da República'],[10,20,'Consciência Negra'],[11,25,'Natal'],[6,2,'Independência da Bahia'],[5,13,'Feriado municipal (Jacobina)'],[5,24,'São João (municipal)'],[11,8,'N. Sra. da Conceição (municipal)']].forEach(([m,d,n])=>h[key(y,m,d)]=n);
+  const p=pascoa(y);const sx=new Date(p);sx.setDate(p.getDate()-2);
+  h[key(y,sx.getMonth(),sx.getDate())]='Sexta-feira Santa';
+  return h;
+}
+
+function calcular(y=S.ano,m=S.mes){
+  const hol=feriados(y);
+  const cap={wk:+$('pWk').value||0,sat:+$('pSat').value||0,sun:+$('pSun').value||0};
+  const nSunOpen=+$('pSunQ').value||0;
+  const total=new Date(y,m+1,0).getDate();
+  const dias=[];let sundayCount=0;
+  for(let d=1;d<=total;d++){
+    const dt=new Date(y,m,d),w=dt.getDay(),k=key(y,m,d),nome=hol[k]||null;
+    let tipo=w===0?'sun':w===6?'sat':'wk';
+    let aberto;
+    if(w===0){sundayCount++;aberto=sundayCount<=nSunOpen&&!nome}
+    else aberto=!nome;
+    if(k in S.over)aberto=S.over[k];
+    dias.push({d,w,k,tipo,nome,aberto,cap:aberto?cap[tipo]:0,meta:0,real:(k in D.real)?D.real[k]:null,motivo:aberto?null:(D.motivo[k]||(nome?'Feriado':'Fechado'))});
+  }
+  const capTotal=dias.reduce((a,x)=>a+x.cap,0);
+  const mv=D.metas[y+'-'+m];const meta=mv==null?capTotal:mv;
+  // distribuição proporcional (maior resto) para fechar exatamente a meta
+  if(capTotal>0){
+    let somaInt=0;const rs=[];
+    dias.forEach(x=>{if(!x.aberto)return;const exato=meta*x.cap/capTotal;x.meta=Math.floor(exato);somaInt+=x.meta;rs.push([x,exato-x.meta])});
+    rs.sort((a,b)=>b[1]-a[1]);
+    for(let i=0;i<meta-somaInt&&rs.length;i++)rs[i%rs.length][0].meta++;
+  }
+  dias.forEach(x=>x.nec=x.meta);
+  const _l=dias.filter(x=>x.aberto&&x.real!==null),_r=dias.filter(x=>x.aberto&&x.real===null);
+  distrib(_r,Math.max(0,meta-_l.reduce((a,x)=>a+x.real,0)));
+  return {dias,cap,capTotal,meta};
+}
+
+function render(keepCal){
+  if(modo.v==='a'){$('ptitle').textContent='Ano '+S.ano;renderAnual();return}
+  if(modo.v==='d'){$('ptitle').textContent='Dia '+S.dia+'/'+(S.mes+1)+'/'+S.ano;renderDia();return}
+  $('ptitle').textContent=MESES[S.mes]+' de '+S.ano;syncHoras();
+  const {dias,cap,capTotal,meta}=calcular();
+  const abertos=dias.filter(x=>x.aberto);
+  const nWk=abertos.filter(x=>x.tipo==='wk').length,nSat=abertos.filter(x=>x.tipo==='sat').length,nSun=abertos.filter(x=>x.tipo==='sun').length;
+  const nHol=dias.filter(x=>!x.aberto&&x.motivo==='Feriado').length;const nMan=dias.filter(x=>!x.aberto&&x.motivo==='Manutenção').length;
+  const pct=capTotal?Math.round(meta/capTotal*100):0;
+  const media=abertos.length?(meta/abertos.length).toFixed(1).replace('.',','):'0';
+  const fmt=n=>n.toLocaleString('pt-BR');
+  const lanc=abertos.filter(x=>x.real!==null);
+  const realTot=lanc.reduce((a,x)=>a+x.real,0);
+  const capLanc=lanc.reduce((a,x)=>a+x.cap,0);
+  const ocup=capLanc?Math.round(realTot/capLanc*100):0;
+  const oCls=n=>n>=100?'ok':n>=80?'mid':'lo';
+  const pctMeta=meta?Math.round(realTot/meta*100):0;
+  const falta=Math.max(0,meta-realTot);
+  const rest=abertos.length-lanc.length;
+  const porDia=rest?Math.ceil(falta/rest):0;
+
+  $('stats').innerHTML=`
+    <div class="stat main"><small>Meta do mês (exames)</small>
+      <input id="metaIn" type="number" min="0" value="${meta}" aria-label="Meta do mês">
+      <span>${pct}% da capacidade ${pct>100?'<b class="warn">· acima do que a agenda comporta</b>':''}</span></div>
+    <div class="stat"><small>Capacidade máxima</small><b>${fmt(capTotal)}</b><span>${nWk} dias úteis × ${cap.wk} + ${nSat} sáb × ${cap.sat} + ${nSun} dom × ${cap.sun}</span></div>
+    <div class="stat"><small>Dias de funcionamento</small><b>${abertos.length}</b><span>${nHol} feriado${nHol===1?'':'s'}${nMan?' · '+nMan+' manutenção':''} no mês</span></div>
+    <div class="stat"><small>Realizado no mês</small><b>${fmt(realTot)}</b><span>${pctMeta}% da meta · ${lanc.length} de ${abertos.length} dias lançados</span></div>
+    <div class="stat"><small>Ocupação da agenda</small><b>${lanc.length?`<span class="chip ${oCls(ocup)}">${ocup}%</span>`:'–'}</b><span>sobre a capacidade dos dias lançados</span></div>
+    <div class="stat"><small>Falta para a meta</small><b>${fmt(falta)}</b><span>${falta===0?(meta>0?'meta batida ✓':'defina a meta'):(rest?`≈ ${porDia} exames/dia nos ${rest} dias sem lançamento`:'sem dias restantes')}</span></div>`;
+  $('metaIn').addEventListener('change',e=>{const v=e.target.value;S.meta=v===''?null:Math.max(0,Math.round(+v));if(S.meta===null)delete D.metas[ym()];else D.metas[ym()]=S.meta;save();render()});
+
+  // calendário
+  const cal=keepCal?document.createElement('div'):$('cal');cal.innerHTML='';
+  ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(n=>{const e=document.createElement('div');e.className='dow';e.textContent=n;cal.appendChild(e)});
+  for(let i=0;i<dias[0].w;i++){const e=document.createElement('div');e.className='day blank';cal.appendChild(e)}
+  dias.forEach(x=>{
+    const b=document.createElement('div');
+    const cls=!x.aberto?(x.motivo==='Feriado'?'hol':x.motivo==='Manutenção'?'man':'off'):x.tipo;
+    const hr=horasDe(S.ano,S.mes,x.tipo),hs=x.aberto&&hr&&hr[0]&&hr[1]?' · '+hr[0]+'–'+hr[1]:'';const rotulo=x.aberto?(x.tipo==='wk'?'Seg–Sex':x.tipo==='sat'?'Sábado':'Domingo')+hs:(x.nome||(x.motivo==='Feriado'?'Feriado (manual)':x.motivo));
+    b.className='day '+cls;
+    b.innerHTML=`<div class="tp"><button type="button" class="dn" aria-label="Detalhar o dia ${x.d}" title="Ver detalhamento do dia">${x.d}</button><button type="button" class="tg" aria-label="${x.aberto?'Fechar':'Abrir'} o dia ${x.d}">${x.aberto?'Fechar':'Abrir'}</button></div><span class="m">${x.aberto?(x.real===null?x.nec:x.meta):x.motivo}</span>${x.aberto?`<span class="lb">${x.real===null?`precisa<span class="lm"> · meta ${x.meta}</span>`:'meta do dia'}</span>`:''}<span class="t">${x.aberto&&x.nome?x.nome+' (aberto)':rotulo}</span>${x.aberto?`<input class="r" type="number" min="0" inputmode="numeric" placeholder="Realizado" aria-label="Exames realizados no dia ${x.d}" value="${x.real===null?'':x.real}"><span class="pc" id="pc-${x.k}"></span>`:''}`;
+    
+    
+    b.querySelector('.tg').onclick=e=>{if(x.aberto){abrirMenu(e.currentTarget,x.k)}else{S.over[x.k]=true;delete D.motivo[x.k];save();render()}};
+    b.querySelector('.dn').onclick=()=>{S.dia=x.d;setModo('d')};
+    const inp=b.querySelector('.r');
+    if(inp){
+      inp.oninput=()=>{const v=inp.value;if(v==='')delete D.real[x.k];else D.real[x.k]=Math.max(0,Math.round(+v));save();render(true)};
+      inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const all=[...document.querySelectorAll('.r')];const i=all.indexOf(inp);(all[i+1]||inp).focus()}};
+    }
+    cal.appendChild(b);
+  });
+
+  // semanas
+  const sem=[];let atual=null;
+  dias.forEach(x=>{if(!atual||x.w===0){atual={ini:x.d,fim:x.d,ab:0,cap:0,meta:0,real:0,capL:0,nl:0};sem.push(atual)}atual.fim=x.d;if(x.aberto)atual.ab++;atual.cap+=x.cap;atual.meta+=x.meta;if(x.aberto&&x.real!==null){atual.real+=x.real;atual.capL+=x.cap;atual.nl++}});
+  let acum=0;
+  const linhas=sem.map((s,i)=>{acum+=s.real;const p=s.meta?s.real/s.meta*100:0;const oc=s.nl&&s.capL?Math.round(s.real/s.capL*100)+'%':'–';const ocCls=s.nl&&s.capL?oCls(Math.round(s.real/s.capL*100)):'';
+    return `<tr><td><b>Semana ${i+1}</b> <span style="color:var(--muted)">(${s.ini}${s.fim>s.ini?'–'+s.fim:''})</span></td><td>${s.ab}</td><td>${fmt(s.cap)}</td><td><b>${fmt(s.meta)}</b></td><td><b>${s.nl?fmt(s.real):'–'}</b></td><td><span class="chip ${ocCls}">${oc}</span></td><td><div class="bar" title="${Math.round(p)}% da meta da semana"><div style="width:${Math.min(100,p)}%"></div></div><small>${s.nl?Math.round(p)+'%':'–'}</small></td></tr>`}).join('');
+  $('semanas').innerHTML=`<thead><tr><th>Semana</th><th>Dias abertos</th><th>Capacidade</th><th>Meta</th><th>Realizado</th><th>Ocupação</th><th>% da meta</th></tr></thead><tbody>${linhas}</tbody><tfoot><tr><td>Total</td><td>${abertos.length}</td><td>${fmt(capTotal)}</td><td>${fmt(meta)}</td><td>${fmt(realTot)}</td><td>${lanc.length?`<span class="chip ${oCls(ocup)}">${ocup}%</span>`:'–'}</td><td>${lanc.length?pctMeta+'%':'–'}</td></tr></tfoot>`;
+  dias.forEach(x=>{const el=document.getElementById('pc-'+x.k);if(!el)return;const c=el.parentElement.classList;c.remove('lo','mid','ok');const cell=el.parentElement;cell.querySelector('.m').textContent=x.real===null?x.nec:x.meta;cell.querySelector('.lb').innerHTML=x.real===null?`precisa<span class="lm"> · meta ${x.meta}</span>`:'meta do dia';if(x.real===null){el.textContent='';return}const o=x.cap?Math.round(x.real/x.cap*100):0;c.add(o>=100?'ok':o>=80?'mid':'lo');el.textContent=(x.real>=x.meta?'✓ ':'')+o+'% ocup.';el.title=x.real>=x.meta?'Meta do dia batida':'Faltaram '+(x.meta-x.real)+' para a meta do dia'});
+}
+
+$('mes').onchange=e=>{S.mes=+e.target.value;S.meta=D.metas[ym()]??null;render()};
+$('ano').onchange=e=>{const v=+e.target.value;if(v>=2020&&v<=2100){S.ano=v;S.meta=D.metas[ym()]??null;render()}};
+['pWk','pSat','pSun','pSunQ'].forEach(id=>$(id).addEventListener('input',()=>render()));
+$('reset').onclick=()=>{const p=S.ano+'-'+S.mes+'-';Object.keys(S.over).forEach(k=>{if(k.startsWith(p))delete S.over[k]});Object.keys(D.motivo).forEach(k=>{if(k.startsWith(p))delete D.motivo[k]});S.meta=null;delete D.metas[ym()];save();render()};
+let armed=false;
+$('clearReal').onclick=function(){const t='Limpar ocupação do mês';if(!armed){armed=true;this.textContent='Clique de novo para confirmar';setTimeout(()=>{armed=false;this.textContent=t},3500);return}armed=false;this.textContent=t;const p=S.ano+'-'+S.mes+'-';Object.keys(D.real).forEach(k=>{if(k.startsWith(p))delete D.real[k]});save();render()};
+$('print').onclick=()=>window.print();
+$('aPrint').onclick=()=>window.print();
+const pg=document.createElement('style');document.head.appendChild(pg);
+window.addEventListener('beforeprint',()=>{pg.textContent=modo.v!=='m'?'@page{size:A4 portrait;margin:8mm}':'@page{size:A4 landscape;margin:8mm}'});
+function distrib(arr,total){
+  const c=arr.reduce((a,x)=>a+x.cap,0);if(!c)return;
+  let s=0;const rs=arr.map(x=>{const e=total*x.cap/c,f=Math.floor(e);x.nec=f;s+=f;return[x,e-f]});
+  rs.sort((a,b)=>b[1]-a[1]);
+  for(let i=0;i<total-s&&rs.length;i++)rs[i%rs.length][0].nec++;
+}
+S.dia=hoje.getDate();
+function goDia(d){S.ano=d.getFullYear();S.mes=d.getMonth();S.dia=d.getDate();$('mes').value=S.mes;$('ano').value=S.ano;S.meta=D.metas[ym()]??null;render()}
+function renderDia(){
+  const fmt=n=>n.toLocaleString('pt-BR');
+  const r=calcular(),nd=r.dias.length;
+  if(!S.dia||S.dia>nd)S.dia=Math.min(S.dia||1,nd);
+  const x=r.dias[S.dia-1],dt=new Date(S.ano,S.mes,S.dia),k=x.k;
+  $('dData').value=S.ano+'-'+String(S.mes+1).padStart(2,'0')+'-'+String(S.dia).padStart(2,'0');
+  const tipoTxt=x.tipo==='wk'?'Segunda a sexta':x.tipo==='sat'?'Sábado':'Domingo';
+  const h=horasDe(S.ano,S.mes,x.tipo),hTxt=h&&h[0]&&h[1]?h[0]+' às '+h[1]:'não informado';
+  const status=x.aberto?`<span class='chip ok'>Aberto</span>`:`<span class='chip ${x.motivo==='Feriado'?'hl':'off'}'>${x.motivo}</span>`;
+  const ab=r.dias.filter(d=>d.aberto),la=ab.filter(d=>d.real!==null);
+  const realTot=la.reduce((a,d)=>a+d.real,0),falta=Math.max(0,r.meta-realTot),rest=ab.length-la.length;
+  const ate=r.dias.slice(0,S.dia),metaAc=ate.reduce((a,d)=>a+d.meta,0),realAc=ate.reduce((a,d)=>a+(d.aberto&&d.real!==null?d.real:0),0);
+  const pAc=metaAc?Math.round(realAc/metaAc*100):0;
+  const i0=Math.max(0,S.dia-1-x.w),sw=r.dias.slice(i0,Math.min(nd-1,S.dia-1-x.w+6)+1);
+  const wMeta=sw.reduce((a,d)=>a+d.meta,0),wReal=sw.reduce((a,d)=>a+(d.aberto&&d.real!==null?d.real:0),0),pW=wMeta?Math.round(wReal/wMeta*100):0;
+  const lanc=x.aberto&&x.real!==null,oc=lanc&&x.cap?Math.round(x.real/x.cap*100):null,saldo=lanc?x.real-x.meta:0,dif=x.nec-x.meta;
+  const sg=n=>(n>0?'+':n<0?'−':'')+Math.abs(n);
+  $('dHead').innerHTML=`<div class='dhead'><h3>${dt.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</h3><div class='tags'>${status}<span class='chip and'>${tipoTxt}</span>${x.nome?`<span class='chip hl'>${x.nome}</span>`:''}<button type='button' class='btn tg' id='dToggle'>${x.aberto?'Fechar o dia':'Reabrir o dia'}</button></div></div><p style='margin:0;color:var(--muted);font-size:.9rem'>Horário previsto de funcionamento: <b>${x.aberto?hTxt:'dia sem atendimento'}</b></p>`;
+  const c=(t,v,s,main)=>`<div class='stat${main?' main':''}'><small>${t}</small><b>${v}</b><span>${s}</span></div>`;
+  let cards='';
+  if(x.aberto){
+    cards+=c('Meta do dia',fmt(x.meta),`capacidade de ${fmt(x.cap)} exames`);
+    cards+=c('Precisa realizar',lanc?'–':fmt(x.nec),lanc?'dia já lançado':(dif===0?'igual à meta do dia':sg(dif)+' em relação à meta do dia'),!lanc);
+    cards+=c('Realizado',lanc?fmt(x.real):'–',lanc?sg(saldo)+' em relação à meta do dia':'aguardando lançamento');
+    cards+=c('Ocupação do dia',oc===null?'–':`<span class='chip ${nivel(oc)}'>${oc}%</span>`,'realizado ÷ capacidade do dia');
+  }else{
+    cards+=c('Dia sem atendimento',x.motivo,x.nome||'não entra na meta do mês');
+  }
+  cards+=c('Acumulado do mês até o dia',fmt(realAc)+' / '+fmt(metaAc),pAc+'% da meta acumulada');
+  cards+=c('Semana do dia',fmt(wReal)+' / '+fmt(wMeta),pW+'% da meta da semana');
+  cards+=c('Falta para a meta do mês',fmt(falta),falta===0?(r.meta>0?'meta do mês batida ✓':'defina a meta'):(rest?`≈ ${fmt(Math.ceil(falta/rest))} exames/dia nos ${rest} dias sem lançamento`:'sem dias restantes'));
+  cards+=c('Peso do dia na meta mensal',r.meta?(x.meta/r.meta*100).toFixed(1).replace('.',',')+'%':'–','participação na meta do mês');
+  $('dStats').innerHTML=cards;
+  $('dToggle').onclick=e=>{if(x.aberto)abrirMenu(e.currentTarget,k);else{S.over[k]=true;delete D.motivo[k];save();render()}};
+  const dr=$('dReal');dr.disabled=!x.aberto;if(document.activeElement!==dr)dr.value=x.aberto&&x.real!==null?x.real:'';
+  const ob=$('dObs');if(document.activeElement!==ob)ob.value=D.obs[k]||'';
+}
+$('dPrev').onclick=()=>goDia(new Date(S.ano,S.mes,S.dia-1));
+$('dNext').onclick=()=>goDia(new Date(S.ano,S.mes,S.dia+1));
+$('dHoje').onclick=()=>goDia(new Date());
+$('dPrint').onclick=()=>window.print();
+$('dData').onchange=e=>{const v=e.target.value;if(!v)return;const [y,m,d]=v.split('-').map(Number);if(y>=2020&&y<=2100)goDia(new Date(y,m-1,d))};
+$('dReal').oninput=e=>{const k=key(S.ano,S.mes,S.dia),v=e.target.value;if(v==='')delete D.real[k];else D.real[k]=Math.max(0,Math.round(+v));save();renderDia()};
+$('dObs').oninput=e=>{const k=key(S.ano,S.mes,S.dia),v=e.target.value;if(v.trim()==='')delete D.obs[k];else D.obs[k]=v;save()};
+const HK=[['wk','hWk'],['sat','hSat'],['sun','hSun']];
+function horasDe(y,m,t){const mm=D.horasM[y+'-'+m];return (mm&&mm[t])||D.horas[t]||null}
+function syncHoras(){
+  $('hMes').textContent=MESES[S.mes]+' de '+S.ano;
+  if(document.activeElement&&document.activeElement.type==='time')return;
+  HK.forEach(([t,id])=>{const h=horasDe(S.ano,S.mes,t)||['',''];$(id+'0').value=h[0];$(id+'1').value=h[1]});
+}
+HK.forEach(([t,id])=>['0','1'].forEach(i=>$(id+i).addEventListener('input',()=>{
+  const k=ym(),mm=D.horasM[k]||(D.horasM[k]={});
+  mm[t]=[$(id+'0').value,$(id+'1').value];save();render();
+})));
+$('hAll').onclick=function(){
+  const src={};HK.forEach(([t])=>{const h=horasDe(S.ano,S.mes,t);if(h)src[t]=[h[0],h[1]]});
+  for(let m=0;m<12;m++)D.horasM[S.ano+'-'+m]=JSON.parse(JSON.stringify(src));
+  save();render();
+  const t0='Repetir em todos os meses do ano';this.textContent='Aplicado a '+S.ano+' ✓';setTimeout(()=>{this.textContent=t0},2000);
+};
+let menuEl=null,menuKey=null;
+function fecharMenu(){if(menuEl)menuEl.classList.remove('on')}
+function abrirMenu(btn,k){
+  if(!menuEl){
+    menuEl=document.createElement('div');menuEl.id='menu';menuEl.setAttribute('role','menu');
+    menuEl.innerHTML=`<b>Motivo do fechamento</b>`+['Manutenção','Fechado','Feriado'].map(o=>`<button type='button' role='menuitem' data-o='${o}'>${o}</button>`).join('');
+    menuEl.addEventListener('click',e=>{const o=e.target.closest('button');if(!o)return;S.over[menuKey]=false;D.motivo[menuKey]=o.dataset.o;save();fecharMenu();render()});
+    document.body.appendChild(menuEl);
+    document.addEventListener('click',e=>{if(menuEl.classList.contains('on')&&!menuEl.contains(e.target)&&!e.target.closest('.tg'))fecharMenu()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharMenu()});
+    window.addEventListener('scroll',fecharMenu,true);window.addEventListener('resize',fecharMenu);
+  }
+  menuKey=k;menuEl.classList.add('on');
+  const r=btn.getBoundingClientRect(),w=menuEl.offsetWidth,h=menuEl.offsetHeight;
+  menuEl.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';
+  menuEl.style.top=(r.bottom+h+8>innerHeight?Math.max(8,r.top-h-4):r.bottom+4)+'px';
+  menuEl.querySelector('button').focus({preventScroll:true});
+}
+const modo={v:'m'};
+const nivel=n=>n>=100?'ok':n>=80?'mid':'lo';
+function setModo(v){modo.v=v;const w=document.querySelector('.wrap');w.classList.toggle('anual',v==='a');w.classList.toggle('dia',v==='d');['M','A','D'].forEach(k=>{const on=k.toLowerCase()===v;$('tab'+k).classList.toggle('on',on);$('tab'+k).setAttribute('aria-pressed',on)});render()}
+$('tabM').onclick=()=>setModo('m');$('tabA').onclick=()=>setModo('a');$('tabD').onclick=()=>setModo('d');
+function anualRows(y){
+  const rows=[];
+  for(let m=0;m<12;m++){
+    const r=calcular(y,m),ab=r.dias.filter(x=>x.aberto),la=ab.filter(x=>x.real!==null);
+    rows.push({m,dias:ab.length,cap:r.capTotal,meta:r.meta,real:la.reduce((a,x)=>a+x.real,0),capL:la.reduce((a,x)=>a+x.cap,0),nl:la.length});
+  }
+  return rows;
+}
+function renderAnual(){
+  const fmt=n=>n.toLocaleString('pt-BR'),y=S.ano,rows=anualRows(y);
+  const cy=hoje.getFullYear(),cm=hoje.getMonth(),isCur=m=>y===cy&&m===cm;
+  const sumMeta=rows.reduce((a,r)=>a+r.meta,0),cap=rows.reduce((a,r)=>a+r.cap,0);
+  const manual=D.anual[y]!=null,metaAno=manual?D.anual[y]:sumMeta;
+  const real=rows.reduce((a,r)=>a+r.real,0),capL=rows.reduce((a,r)=>a+r.capL,0),dias=rows.reduce((a,r)=>a+r.dias,0);
+  const pct=metaAno?Math.round(real/metaAno*100):0,ocup=capL?Math.round(real/capL*100):null;
+  const falta=Math.max(0,metaAno-real),rem=y<cy?0:y>cy?12:12-cm,porMes=rem?Math.ceil(falta/rem):0;
+  const fech=rows.filter(r=>r.nl>0&&!isCur(r.m)),fm=fech.reduce((a,r)=>a+r.meta,0),fr=fech.reduce((a,r)=>a+r.real,0),pf=fm?Math.round(fr/fm*100):null;
+  $('aAno').textContent=y;
+  const chip=n=>`<span class='chip ${nivel(n)}'>${n}%</span>`;
+  $('aStats').innerHTML=
+    `<div class='stat main'><small>Meta anual (exames)</small><input id='aMeta' type='number' min='0' value='${metaAno}' aria-label='Meta anual'><span>${manual&&sumMeta!==metaAno?`<b class='warn'>metas mensais somam ${fmt(sumMeta)}</b>`:'igual à soma das metas mensais'}</span></div>`+
+    `<div class='stat'><small>Realizado no ano</small><b>${fmt(real)}</b><span>${pct}% da meta anual</span></div>`+
+    `<div class='stat'><small>Atingimento dos meses fechados</small><b>${pf===null?'–':chip(pf)}</b><span>${fech.length} mês(es) com lançamento</span></div>`+
+    `<div class='stat'><small>Ocupação da agenda</small><b>${ocup===null?'–':chip(ocup)}</b><span>sobre a capacidade dos dias lançados</span></div>`+
+    `<div class='stat'><small>Falta para a meta anual</small><b>${fmt(falta)}</b><span>${falta===0?(metaAno>0?'meta anual batida ✓':'defina a meta'):(rem?`≈ ${fmt(porMes)} exames/mês nos ${rem} meses restantes`:'ano encerrado')}</span></div>`+
+    `<div class='stat'><small>Capacidade anual</small><b>${fmt(cap)}</b><span>meta = ${cap?Math.round(metaAno/cap*100):0}% da capacidade · ${dias} dias abertos</span></div>`;
+  $('aMeta').onchange=e=>{const v=e.target.value;if(v==='')delete D.anual[y];else D.anual[y]=Math.max(0,Math.round(+v));save();renderAnual()};
+  const W=720,H=210,pad=24,base=H-26,top=22,mx=Math.max(1,...rows.map(r=>Math.max(r.meta,r.real))),gw=(W-pad*2)/12,bw=gw*.32;
+  let s=`<svg viewBox='0 0 ${W} ${H}' role='img' aria-label='Meta e realizado por mês'>`;
+  rows.forEach((r,i)=>{
+    const x=pad+i*gw+gw*.14,hm=r.meta/mx*(base-top),hr=r.real/mx*(base-top),p=r.meta?Math.round(r.real/r.meta*100):0,cx=pad+i*gw+gw/2;
+    s+=`<rect class='bm' x='${x}' y='${base-hm}' width='${bw}' height='${hm}' rx='3'/><rect class='b-${r.nl?(isCur(r.m)?'and':nivel(p)):'x'}' x='${x+bw+3}' y='${base-hr}' width='${bw}' height='${hr}' rx='3'/><text class='tx' x='${cx}' y='${H-8}' text-anchor='middle'>${MESES[i].slice(0,3)}</text>`;
+    if(r.nl)s+=`<text class='tx tb' x='${cx}' y='${base-Math.max(hm,hr)-5}' text-anchor='middle'>${p}%</text>`;
+  });
+  s+=`<line class='ax' x1='${pad}' x2='${W-pad}' y1='${base}' y2='${base}'/></svg>`;
+  $('aChart').innerHTML=s;
+  let ma=0,ra=0;
+  const tr=rows.map(r=>{
+    ma+=r.meta;ra+=r.real;
+    const p=r.meta?Math.round(r.real/r.meta*100):0,o=r.capL?Math.round(r.real/r.capL*100):null;
+    const ac=!r.nl?'–':`<span class='chip ${isCur(r.m)?'and':nivel(p)}' title='${isCur(r.m)?'mês em andamento':''}'>${p}%</span>`;
+    return `<tr><td><button class='lk' data-m='${r.m}'>${MESES[r.m]}</button></td><td>${r.dias}</td><td>${fmt(r.cap)}</td><td>${fmt(r.meta)}</td><td><b>${r.nl?fmt(r.real):'–'}</b></td><td>${o===null?'–':chip(o)}</td><td>${ac}</td><td>${fmt(ma)}</td><td>${ra>0||r.nl?fmt(ra):'–'}</td></tr>`}).join('');
+  $('aTab').innerHTML=`<thead><tr><th>Mês</th><th>Dias abertos</th><th>Capacidade</th><th>Meta</th><th>Realizado</th><th>Ocupação</th><th>Atingimento</th><th>Meta acum.</th><th>Realizado acum.</th></tr></thead><tbody>${tr}</tbody><tfoot><tr><td>Ano ${y}</td><td>${dias}</td><td>${fmt(cap)}</td><td>${fmt(sumMeta)}</td><td>${fmt(real)}</td><td>${ocup===null?'–':ocup+'%'}</td><td>${pct}% da meta anual</td><td></td><td></td></tr></tfoot>`;
+  document.querySelectorAll('#aTab .lk').forEach(b=>b.onclick=()=>{S.mes=+b.dataset.m;S.meta=D.metas[ym()]??null;$('mes').value=S.mes;setModo('m')});
+}
+render();
+</script>
+</body>
+</html>
